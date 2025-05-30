@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Artesanos.com</title>
+  <link rel="stylesheet" href="css.css ">
+</head>
+<body>
+  <h1>Registrarse</h1>
+
+  <form id="formRegistro">
+    <input type="text" name="nombre" placeholder="Nombre" required><br>
+    <input type="email" name="email" placeholder="Correo electrónico" required><br>
+    <input type="password" name="password" placeholder="Contraseña" required><br>
+    <input type="text" name="imagen_perfil" placeholder="URL de imagen (opcional)"><br>
+    <button type="submit">Registrarse</button>
+  </form>
+
+  <p id="mensaje"></p>
+
+  <script>
+    const form = document.getElementById('formRegistro');
+    const mensaje = document.getElementById('mensaje');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        nombre: form.nombre.value,
+        email: form.email.value,
+        password: form.password.value,
+        imagen_perfil: form.imagen_perfil.value
+      };
+
+      try {
+        const res = await fetch('http://localhost:3000/api/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        mensaje.textContent = result.mensaje || result.error;
+      } catch (err) {
+        mensaje.textContent = 'Error al registrar';
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

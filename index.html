@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Inicio - Artesanos.com</title>
+  <link rel="stylesheet" href="css.css ">
+</head>
+<body>
+   
+      
+  <h1>Artesanos.com</h1>
+  <h2>Bienvenido, <span id="nombreUsuario"></span></h2>
+  <button onclick="cerrarSesion()">Cerrar sesión</button> 
+
+  <hr>
+
+  <h3>📸 Publicar una imagen</h3>
+  <form id="formImagen">
+    <label for="">
+        <input type="text" id="titulo" placeholder="Título de la imagen" required>
+    </label>
+    
+    <label for="">
+        <input type="file" id="archivoImagen" accept="image/*"  placeholder="Imagen" required>
+    </label>
+    
+    <button type="submit">Subir imagen</button>
+  </form>
+  <p id="estadoPublicacion"></p>
+
+  <hr>
+
+  <h3>🤝 Solicitudes de amistad</h3>
+  <div id="solicitudesPendientes">
+    <p>Cargando solicitudes...</p>
+  </div>
+
+  <hr>
+
+  <h3>🎨 Imágenes compartidas</h3>
+  <div id="galeria">
+    <p>No hay imágenes aún.</p>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Debes iniciar sesión');
+      window.location.href = 'login.html';
+    }
+
+    // Obtener info del usuario desde el token
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    document.getElementById('nombreUsuario').textContent = payload.nombre;
+
+    function cerrarSesion() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    document.getElementById('formImagen').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const titulo = document.getElementById('titulo').value;
+      const archivo = document.getElementById('archivoImagen').files[0];
+      const estado = document.getElementById('estadoPublicacion');
+
+      if (!archivo) {
+        estado.textContent = 'Seleccioná una imagen.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('titulo', titulo);
+      formData.append('imagen', archivo);
+
+      try {
+        const res = await fetch('http://localhost:3000/api/imagenes', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + token
+          },
+          body: formData
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          estado.style.color = 'green';
+          estado.textContent = 'Imagen subida correctamente.';
+          document.getElementById('formImagen').reset();
+        } else {
+          estado.style.color = 'red';
+          estado.textContent = data.error || 'Error al subir la imagen.';
+        }
+      } catch (err) {
+        estado.style.color = 'red';
+        estado.textContent = 'Error de red.';
+      }
+    });
+
+    // TODO: cargar solicitudes de amistad y galería
+  </script>
+</body>
+</html>

@@ -75,7 +75,7 @@
       formData.append('imagen', archivo);
 
       try {
-        const res = await fetch('http://localhost:3000/api/imagenes', {
+        const res = await fetch('https://backend-artesanos.onrender.com/api/imagenes', {
           method: 'POST',
           headers: {
             Authorization: 'Bearer ' + token

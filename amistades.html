@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Buscar usuarios - Artesanos</title>
+  <link rel="stylesheet" href="css.css ">
+</head>
+<body>
+
+  <h2>🔍 Buscar otros usuarios</h2>
+  <input type="text" id="busqueda" placeholder="Nombre o email" />
+  <button onclick="buscar()">Buscar</button>
+
+  <div id="resultados"></div>
+
+  <script>
+    const API = 'http://localhost:3000';
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Debes iniciar sesión');
+      window.location.href = 'login.html';
+    }
+
+    async function buscar() {
+      const q = document.getElementById('busqueda').value.trim();
+      if (!q) {
+        alert('Escribí algo para buscar');
+        return;
+      }
+
+      console.log('Token enviado:', token);
+
+      const res = await fetch(`${API}/api/usuarios/buscar?q=${encodeURIComponent(q)}`, {
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      });
+
+      const usuarios = await res.json();
+      const div = document.getElementById('resultados');
+      div.innerHTML = '';
+
+      if (usuarios.length === 0) {
+        div.innerHTML = '<p>No se encontraron usuarios.</p>';
+        return;
+      }
+
+      usuarios.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'usuario';
+        item.innerHTML = `
+          <p><strong>${user.nombre}</strong> (${user.email})</p>
+          <button onclick="solicitarAmistad(${user.id})">Enviar solicitud</button>
+        `;
+        div.appendChild(item);
+      });
+    }
+
+    async function solicitarAmistad(id) {
+      const res = await fetch(`${API}/api/amistad/solicitar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
+        body: JSON.stringify({ para_usuario_id: id })
+      });
+
+      const data = await res.json();
+      alert(data.mensaje || data.error);
+    }
+  </script>
+
+</body>
+</html>

@@ -11,6 +11,7 @@
       
   <h1>Artesanos.com</h1>
   <h2>Bienvenido, <span id="nombreUsuario"></span></h2>
+  <button > <a href="amistades.html">Buscar usuario</a></button> 
   <button onclick="cerrarSesion()">Cerrar sesión</button> 
 
   <hr>
@@ -99,6 +100,9 @@
     });
 
     // TODO: cargar solicitudes de amistad y galería
+      const rutasAmistades = require('./routes/amistades');
+     app.use('/api/amistad', rutasAmistades);
+
   </script>
 </body>
 </html>

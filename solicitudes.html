@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitudes de amistad recibidas</title>
+  <link rel="stylesheet" href="css.css ">
+ 
+</head>
+<body>
+  <button class="volver" onclick="window.location.href='index.html'">🏠 Volver al inicio</button>
+
+
+  <h2>📥 Solicitudes de amistad recibidas</h2>
+  <div id="listaSolicitudes"></div>
+
+  <script>
+     const API = 'https://backend-artesanos.onrender.com';
+    // const API = 'http://localhost:3000'; 
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Tenés que iniciar sesión');
+      window.location.href = 'login.html';
+    }
+
+    async function obtenerSolicitudes() {
+      const res = await fetch(`${API}/api/amistad/pendientes`, {
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      });
+
+      const solicitudes = await res.json();
+      const contenedor = document.getElementById('listaSolicitudes');
+      contenedor.innerHTML = '';
+
+      if (!Array.isArray(solicitudes) || solicitudes.length === 0) {
+        contenedor.innerHTML = '<p>No tenés solicitudes pendientes.</p>';
+        return;
+      }
+
+      solicitudes.forEach(soli => {
+        const div = document.createElement('div');
+        div.className = 'solicitud';
+        div.innerHTML = `
+          <p><strong>${soli.nombre_emisor}</strong> (${soli.email}) te envió una solicitud.</p>
+          <button class="aceptar" onclick="responderSolicitud(${soli.id}, 'aceptar')">Aceptar</button>
+          <button class="rechazar" onclick="responderSolicitud(${soli.id}, 'rechazar')">Rechazar</button>
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+
+    async function responderSolicitud(id, accion) {
+      const res = await fetch(`${API}/api/amistad/${accion}/${id}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      });
+
+      const data = await res.json();
+      alert(data.mensaje || data.error);
+      obtenerSolicitudes(); // refresca la lista
+    }
+
+    obtenerSolicitudes();
+  </script>
+
+</body>
+</html>
+

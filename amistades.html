@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css.css ">
 </head>
 <body>
+  <button class="volver" onclick="window.location.href='index.html'">🏠 Volver al inicio</button>
 
   <h2>🔍 Buscar otros usuarios</h2>
   <input type="text" id="busqueda" placeholder="Nombre o email" />
@@ -15,9 +16,8 @@
   <div id="resultados"></div>
 
   <script>
-    const API = 'https://backend-artesanos.onrender.com';
-    //const API = 'http://localhost:3000';
-
+    //  const API = 'http://localhost:3000';
+     const API = 'https://backend-artesanos.onrender.com';
     const token = localStorage.getItem('token');
 
     if (!token) {

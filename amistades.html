@@ -17,7 +17,7 @@
 
   <script>
     //  const API = 'http://localhost:3000';
-     const API = 'https://backend-artesanos.onrender.com';
+    const API = 'https://backend-artesanos.onrender.com';
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -49,15 +49,35 @@
         return;
       }
 
+      // usuarios.forEach(user => {
+      //   const item = document.createElement('div');
+      //   item.className = 'usuario';
+      //   item.innerHTML = `
+      //     <p><strong>${user.nombre}</strong> (${user.email})</p>
+      //     <button onclick="solicitarAmistad(${user.id})">Enviar solicitud</button>
+      //   `;
+      //   div.appendChild(item);
+      // });
       usuarios.forEach(user => {
-        const item = document.createElement('div');
-        item.className = 'usuario';
-        item.innerHTML = `
-          <p><strong>${user.nombre}</strong> (${user.email})</p>
-          <button onclick="solicitarAmistad(${user.id})">Enviar solicitud</button>
-        `;
-        div.appendChild(item);
-      });
+  const item = document.createElement('div');
+  item.className = 'usuario';
+
+  let contenido = `<p><strong>${user.nombre}</strong> (${user.email})</p>`;
+
+  if (user.estado_amistad === 'pendiente') {
+    contenido += `<p style="color: orange;">⌛ Solicitud pendiente</p>`;
+  } else if (user.estado_amistad === 'aceptada') {
+    contenido += `<p style="color: green;">✅ Ya son amigas</p>`;
+  } else {
+    contenido += `<button onclick="solicitarAmistad(${user.id})">Enviar solicitud</button>`;
+  }
+
+  item.innerHTML = contenido;
+  div.appendChild(item);
+});
+
+
+
     }
 
     async function solicitarAmistad(id) {

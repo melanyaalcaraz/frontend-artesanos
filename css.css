@@ -15,13 +15,15 @@ body {
   }
   
   input, button {
-    /* width: 90%; */
     padding: 12px;
     margin: 10px 0;
     border: none;
     border-radius: 8px;
   }
   
+  input{
+    width: 60%;
+  }
   button {
     background: #c87e4f;
     color: white;
@@ -30,8 +32,8 @@ body {
   }
 
   a {
-    color: inherit;       /* Usa el color del texto del contenedor */
-    text-decoration: none; /* Quita el subrayado */
+    color: inherit;       
+    text-decoration: none; 
   }
     
   
@@ -70,5 +72,55 @@ body {
       border-radius: 6px;
       cursor: pointer;
     }
+
+    .usuario {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 50%;
+     
+    }
+    
+    .usuario p {
+      margin: 5px 0;
+    }
+
+    #galeria {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+  
+    .galeria-item {
+      background-color: white;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+  
+    .galeria-item:hover {
+      transform: scale(1.03);
+    }
+  
+    .galeria-item img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+  
+    .galeria-item p {
+      margin: 0;
+      font-weight: bold;
+      color: #333;
+    }
+    
+   
+    
   
  

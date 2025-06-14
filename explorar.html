@@ -3,43 +3,16 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="UTF-8" />
-  <title>Inicio - Artesanos.com</title>
+  <meta charset="UTF-8">
+  <title>Explorar imágenes de contactos</title>
   <link rel="stylesheet" href="css.css ">
+
 </head>
 
 <body>
-
-
-  <h1>Artesanos.com</h1>
-  <h2>Bienvenido, <span id="nombreUsuario"></span></h2>
-  <button> <a href="amistades.html">Buscar usuario</a></button>
-  <button> <a href="solicitudes.html">Ver Solicitudes</a></button>
-  <button> <a href="explorar.html">Ver imagenes de amigos</a></button>
-  <button onclick="cerrarSesion()">Cerrar sesión</button>
-
-  <hr>
-
-  <h3>📸 Publicar una imagen</h3>
-  <form id="formImagen">
-    <label for="">
-      <input type="text" id="titulo" placeholder="Título de la imagen" required>
-    </label>
-
-    <label for="">
-      <input type="file" id="archivoImagen" name="imagen" accept="image/*" placeholder="Imagen" required>
-    </label>
-
-    <button type="submit">Subir imagen</button>
-
-    <p id="estadoPublicacion"></p>
-  </form>
-  <hr>
-
-  <h3>🎨 Imágenes compartidas</h3>
-  <div id="galeria">
-    <p>No hay imágenes aún.</p>
-  </div>
+  <button class="volver" onclick="window.location.href='index.html'">🏠 Volver al inicio</button>
+  <h2>Imágenes compartidas por tus contactos</h2>
+  <div id="galeriaCompartida"></div>
 
   <div id="modal" class="modal">
     <div class="modal-content">
@@ -61,107 +34,53 @@
     </div>
   </div>
 
+
   <script>
-    const API = 'https://backend-artesanos.onrender.com';
+     const API = 'https://backend-artesanos.onrender.com';
     // const API = 'http://localhost:3000';
     const token = localStorage.getItem('token');
+    let imagenActualId = null;
 
     if (!token) {
       alert('Debes iniciar sesión');
       window.location.href = 'login.html';
     }
 
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const miNombre = payload.nombre;
-    document.getElementById('nombreUsuario').textContent = miNombre;
-
-    function cerrarSesion() {
-      localStorage.removeItem('token');
-      window.location.href = 'login.html';
-    }
-
-    document.getElementById('formImagen').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const titulo = document.getElementById('titulo').value.trim();
-      const archivo = document.getElementById('archivoImagen').files[0];
-      const estado = document.getElementById('estadoPublicacion');
-
-      if (!titulo || !archivo) {
-        estado.textContent = 'Completá todos los campos.';
-        estado.style.color = 'red';
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('titulo', titulo);
-      formData.append('imagen', archivo);
-
+    async function cargarImagenesCompartidas() {
       try {
-        const res = await fetch(`${API}/api/imagenes`, {
-          method: 'POST',
-          headers: {
-            Authorization: 'Bearer ' + token
-          },
-          body: formData
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          estado.textContent = data.mensaje;
-          estado.style.color = 'green';
-          document.getElementById('formImagen').reset();
-          cargarGaleria();
-        } else {
-          estado.textContent = data.error || 'Error al subir imagen.';
-          estado.style.color = 'red';
-        }
-      } catch (error) {
-        estado.textContent = 'Error de red o servidor.';
-        estado.style.color = 'red';
-        console.error(error);
-      }
-    });
-
-    async function cargarGaleria() {
-      try {
-        const res = await fetch(`${API}/api/imagenes`, {
-          headers: {
-            Authorization: 'Bearer ' + token
-          }
+        const res = await fetch(`${API}/api/imagenes/compartidas`, {
+          headers: { Authorization: 'Bearer ' + token }
         });
 
         const imagenes = await res.json();
-        const galeria = document.getElementById('galeria');
-        galeria.innerHTML = '';
+        const contenedor = document.getElementById('galeriaCompartida');
+        contenedor.innerHTML = '';
 
         if (!imagenes.length) {
-          galeria.innerHTML = '<p>No subiste ninguna imagen aún.</p>';
+          contenedor.innerHTML = '<p>No hay imágenes compartidas por tus contactos.</p>';
           return;
         }
 
         imagenes.forEach(img => {
           const ruta = `${API}/public/imagenes/${encodeURIComponent(img.url)}`;
-          const div = document.createElement('div');
-          div.className = 'galeria-item';
-          div.innerHTML = `
-            <p><strong>${img.titulo}</strong></p>
+          const item = document.createElement('div');
+          item.className = 'galeria-item';
+          item.innerHTML = `
+            <p><strong>${img.titulo}</strong> <br><em>por ${img.autor}</em></p>
             <img src="${ruta}" alt="${img.titulo}" onclick="abrirModal(${img.id}, '${img.titulo}', '${ruta}', '${img.autor}')">
-            
           `;
-          galeria.appendChild(div);
-
+          contenedor.appendChild(item);
         });
-      } catch (err) {
-        console.error('Error al cargar galería:', err);
+      } catch (error) {
+        console.error('Error al cargar imágenes compartidas:', error);
       }
     }
 
-    function abrirModal(id, titulo, url) {
+    function abrirModal(id, titulo, url, autor) {
       imagenActualId = id;
       document.getElementById('modalImagen').src = url;
       document.getElementById('modalTitulo').textContent = titulo;
-      document.getElementById('modalAutor').textContent = miNombre;
+      document.getElementById('modalAutor').textContent = `por ${autor}`;
       document.getElementById('modal').style.display = 'block';
       document.getElementById('inputComentarioModal').value = '';
       cargarComentariosModal(id);
@@ -225,8 +144,7 @@
       }
     }
 
-    // Cargar al iniciar
-    cargarGaleria();
+    cargarImagenesCompartidas();
   </script>
 
 </body>

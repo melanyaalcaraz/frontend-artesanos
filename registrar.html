@@ -21,34 +21,49 @@
 
   <p id="mensaje"></p>
 
+
   <script>
     const form = document.getElementById('formRegistro');
     const mensaje = document.getElementById('mensaje');
-
+  
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
+  
+      const password = form.password.value.trim();
+  
+      
+      const regex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
+      if (!regex.test(password)) {
+        mensaje.textContent = 'La contraseña debe tener al menos 6 caracteres, una letra y un número.';
+        mensaje.style.color = 'red';
+        return;
+      }
+  
       const data = {
         nombre: form.nombre.value,
         email: form.email.value,
-        password: form.password.value,
+        password,
         imagen_perfil: form.imagen_perfil.value
       };
-
+  
       try {
         const res = await fetch('https://backend-artesanos.onrender.com/api/registro', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
-
+  
         const result = await res.json();
         mensaje.textContent = result.mensaje || result.error;
+        mensaje.style.color = res.ok ? 'green' : 'red';
       } catch (err) {
         mensaje.textContent = 'Error al registrar';
+        mensaje.style.color = 'red';
         console.error(err);
       }
     });
   </script>
+  
+
 </body>
 </html>
